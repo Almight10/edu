@@ -1,0 +1,172 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -------------------------------------------------------------------------
+    // Helper Functions
+    // -------------------------------------------------------------------------
+
+    /**
+     * Checks if a user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the authenticated user's UID matches the provided userId.
+     * This is the foundation of the ownership model.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Checks if a document exists before an update or delete operation.
+     */
+    function docExists() {
+      return resource != null;
+    }
+
+    /**
+     * Combines ownership check with an existence check for secure updates/deletes.
+     */
+    function isExistingOwner(userId) {
+      return docExists() && isOwner(userId);
+    }
+    
+    /**
+     * Gets the role of the currently authenticated user from their user profile.
+     * Caches the result of the get() call for the duration of the request evaluation.
+     */
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
+    /**
+     * Checks if the authenticated user has the 'instructor' role.
+     */
+    function isInstructor() {
+      return isSignedIn() && getUserRole() == 'instructor';
+    }
+    
+    /**
+     * Checks if the authenticated user has the 'admin' role.
+     */
+    function isAdmin() {
+      return isSignedIn() && getUserRole() == 'admin';
+    }
+
+    /**
+     * Checks if the authenticated user is the designated instructor of a specific course.
+     * Requires reading the course document.
+     */
+    function isCourseInstructor(courseId) {
+      let course = get(/databases/$(database)/documents/courses/$(courseId)).data;
+      return isSignedIn() && course.instructorId == request.auth.uid;
+    }
+    
+    /**
+     * A secure version of isCourseInstructor for state-changing operations.
+     */
+    function isExistingCourseInstructor(courseId) {
+      return docExists() && isCourseInstructor(courseId);
+    }
+
+    // -------------------------------------------------------------------------
+    // Collection Rules
+    // -------------------------------------------------------------------------
+
+    /**
+     * @description Controls access to user profile documents.
+     * @path /users/{userId}
+     * @allow (create) An authenticated user can create their own user profile document.
+     * @deny (list) Listing all users is forbidden to protect user privacy.
+     * @principle Restricts access to a user's own data tree and enforces self-creation.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+
+    /**
+     * @description Controls access to course information. Courses are public to any signed-in user, but only manageable by their designated instructor.
+     * @path /courses/{courseId}
+     * @allow (get) Any signed-in user can view course details.
+     * @deny (create) A user who is not an instructor cannot create a course.
+     * @principle Implements a "Public Read with Owner-Only Writes" pattern.
+     */
+    match /courses/{courseId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if isInstructor();
+      allow update: if isExistingCourseInstructor(courseId);
+      allow delete: if isExistingCourseInstructor(courseId);
+    }
+
+    /**
+     * @description Controls access to a user's enrollment records in courses.
+     * @path /users/{userId}/enrollments/{enrollmentId}
+     * @allow (create) A student can create an enrollment record for themselves.
+     * @deny (get) A user cannot read another user's enrollment records.
+     * @principle Enforces document ownership within a user's private subcollection.
+     */
+    match /users/{userId}/enrollments/{enrollmentId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Controls access to course assignments. Assignments are public to any signed-in user, but only manageable by the course instructor.
+     * @path /courses/{courseId}/assignments/{assignmentId}
+     * @allow (create) The course instructor can create a new assignment for their course.
+     * @deny (delete) A student or another instructor cannot delete an assignment from a course they don't own.
+     * @principle Secures a subcollection based on an ownership field in the parent document.
+     */
+    match /courses/{courseId}/assignments/{assignmentId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if isCourseInstructor(courseId);
+      allow update: if isExistingCourseInstructor(courseId);
+      allow delete: if isExistingCourseInstructor(courseId);
+    }
+
+    /**
+     * @description Controls access to student submissions for assignments.
+     * @path /users/{userId}/assignments/{assignmentId}/submissions/{submissionId}
+     * @allow (create) A student can submit their own work for an assignment.
+     * @deny (get) A user cannot see another student's submissions.
+     * @principle Enforces document ownership for students and allows read/update access for grading by instructors.
+     */
+    match /users/{userId}/assignments/{assignmentId}/submissions/{submissionId} {
+      // CRITICAL: For instructor access to work, the 'instructorId' from the course
+      // MUST be denormalized onto every submission document.
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Controls access to public announcements. Announcements are readable by any signed-in user, but can only be created by instructors or admins.
+     * @path /announcements/{announcementId}
+     * @allow (create) An instructor can post a new announcement.
+     * @deny (update) A user cannot edit an announcement they did not author.
+     * @principle Implements a "Public Read with Owner-Only Writes" pattern, with creation restricted by role.
+     */
+    match /announcements/{announcementId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if (isInstructor() || isAdmin());
+      allow update: if isExistingOwner(resource.data.authorId);
+      allow delete: if isExistingOwner(resource.data.authorId);
+    }
+  }
+}

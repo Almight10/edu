@@ -1,0 +1,342 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user in the EduConnect system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user entity."
+        },
+        "googleId": {
+          "type": "string",
+          "description": "Google ID of the user, obtained from Google OAuth."
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name of the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "profilePicture": {
+          "type": "string",
+          "description": "URL to the user's profile picture.",
+          "format": "uri"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role of the user (e.g., student, instructor, admin)."
+        }
+      },
+      "required": [
+        "id",
+        "googleId",
+        "name",
+        "email",
+        "profilePicture",
+        "role"
+      ]
+    },
+    "Course": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Course",
+      "type": "object",
+      "description": "Represents a course offered in the EduConnect system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the course entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the course."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the course."
+        },
+        "instructorId": {
+          "type": "string",
+          "description": "Reference to Instructor. (Relationship: Instructor 1:N Course)"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "instructorId"
+      ]
+    },
+    "Enrollment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Enrollment",
+      "type": "object",
+      "description": "Represents a student's enrollment in a course.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the enrollment record."
+        },
+        "studentId": {
+          "type": "string",
+          "description": "Reference to Student. (Relationship: Student 1:N Enrollment)"
+        },
+        "courseId": {
+          "type": "string",
+          "description": "Reference to Course. (Relationship: Course 1:N Enrollment)"
+        },
+        "enrollmentDate": {
+          "type": "string",
+          "description": "Date when the student enrolled in the course.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "studentId",
+        "courseId",
+        "enrollmentDate"
+      ]
+    },
+    "Assignment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Assignment",
+      "type": "object",
+      "description": "Represents an assignment for a specific course.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the assignment."
+        },
+        "courseId": {
+          "type": "string",
+          "description": "Reference to Course. (Relationship: Course 1:N Assignment)"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the assignment."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the assignment."
+        },
+        "dueDate": {
+          "type": "string",
+          "description": "Due date for the assignment.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "courseId",
+        "title",
+        "description",
+        "dueDate"
+      ]
+    },
+    "Submission": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Submission",
+      "type": "object",
+      "description": "Represents a student's submission for an assignment.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the submission."
+        },
+        "assignmentId": {
+          "type": "string",
+          "description": "Reference to Assignment. (Relationship: Assignment 1:N Submission)"
+        },
+        "studentId": {
+          "type": "string",
+          "description": "Reference to Student. (Relationship: Student 1:N Submission)"
+        },
+        "submissionDate": {
+          "type": "string",
+          "description": "Date when the assignment was submitted.",
+          "format": "date-time"
+        },
+        "submissionContent": {
+          "type": "string",
+          "description": "Content of the submission (e.g., text, file URL)."
+        },
+        "grade": {
+          "type": "number",
+          "description": "Grade received for the submission."
+        }
+      },
+      "required": [
+        "id",
+        "assignmentId",
+        "studentId",
+        "submissionDate",
+        "submissionContent"
+      ]
+    },
+    "Announcement": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Announcement",
+      "type": "object",
+      "description": "Represents an announcement posted by an instructor or admin.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the announcement."
+        },
+        "authorId": {
+          "type": "string",
+          "description": "Reference to Author. (Relationship: Author 1:N Announcement)"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the announcement."
+        },
+        "content": {
+          "type": "string",
+          "description": "Content of the announcement."
+        },
+        "postDate": {
+          "type": "string",
+          "description": "Date when the announcement was posted.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "authorId",
+        "title",
+        "content",
+        "postDate"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user data. Path-based ownership ensures users can only access their own documents.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/courses/{courseId}",
+        "definition": {
+          "entityName": "Course",
+          "schema": {
+            "$ref": "#/backend/entities/Course"
+          },
+          "description": "Stores course data. Instructors can manage the courses they create.",
+          "params": [
+            {
+              "name": "courseId",
+              "description": "The unique identifier for the course."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/enrollments/{enrollmentId}",
+        "definition": {
+          "entityName": "Enrollment",
+          "schema": {
+            "$ref": "#/backend/entities/Enrollment"
+          },
+          "description": "Stores enrollment records, linking students to courses. Path-based ownership ensures users can only access their own enrollment records.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user (student)."
+            },
+            {
+              "name": "enrollmentId",
+              "description": "The unique identifier for the enrollment record."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/courses/{courseId}/assignments/{assignmentId}",
+        "definition": {
+          "entityName": "Assignment",
+          "schema": {
+            "$ref": "#/backend/entities/Assignment"
+          },
+          "description": "Stores assignments for a specific course. Instructors can manage assignments for their courses.",
+          "params": [
+            {
+              "name": "courseId",
+              "description": "The unique identifier for the course."
+            },
+            {
+              "name": "assignmentId",
+              "description": "The unique identifier for the assignment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/assignments/{assignmentId}/submissions/{submissionId}",
+        "definition": {
+          "entityName": "Submission",
+          "schema": {
+            "$ref": "#/backend/entities/Submission"
+          },
+          "description": "Stores student submissions for assignments. Path-based ownership ensures users can only access their own submissions.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user (student)."
+            },
+            {
+              "name": "assignmentId",
+              "description": "The unique identifier for the assignment."
+            },
+            {
+              "name": "submissionId",
+              "description": "The unique identifier for the submission."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/announcements/{announcementId}",
+        "definition": {
+          "entityName": "Announcement",
+          "schema": {
+            "$ref": "#/backend/entities/Announcement"
+          },
+          "description": "Stores announcements. Rules can restrict creation/modification based on user roles.",
+          "params": [
+            {
+              "name": "announcementId",
+              "description": "The unique identifier for the announcement."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to support EduConnect's core features while adhering to the principles of Authorization Independence, Structural Segregation, and Access Modeling. User authentication is handled via Google OAuth, and the user's `uid` from Firebase Authentication is used for authorization. The structure employs path-based ownership and membership maps to control access to data.\n\n*   **Users:** User data is stored in `/users/{userId}`, providing path-based ownership. Each user document contains essential information like `googleId`, `name`, `email`, and `role`.\n*   **Courses:** Course data is stored in `/courses/{courseId}`. Each course document includes the `instructorId`. Instructors can manage the courses they create.\n*   **Enrollments:** Enrollment records, linking students to courses, are stored in `/users/{userId}/enrollments/{enrollmentId}` to represent the `Student 1:N Enrollment` relationship. This structure ensures clear ownership and simplifies security rules.\n*   **Assignments:** Assignments are stored as subcollections under courses in `/courses/{courseId}/assignments/{assignmentId}`. This structure allows efficient retrieval of assignments for a specific course.\n*   **Submissions:** Submissions are stored as subcollections under assignments, within the student's document, in `/users/{userId}/assignments/{assignmentId}/submissions/{submissionId}`. This allows direct access to the submissions of a specific user for a specific assignment, and avoids filtering in rules.\n*   **Announcements:** Announcements are stored in a top-level collection `/announcements/{announcementId}`. Each announcement includes the `authorId`, and rules can restrict creation/modification based on the user's role (e.g., only admins or instructors can create announcements).\n\n**Authorization Independence (Denormalization):**\n\n*   While not explicitly denormalized in this schema, further enhancements might include denormalizing instructor role into course documents or student role into enrollment documents if access control becomes more complex. For instance, to grant access to specific materials to assistants, the assistants list could be denormalized into the course document.\n\n**QAPs (Rules are not Filters):**\n\n*   The structure facilitates secure `list` operations by segregating data based on ownership. For instance, listing enrollments is done within the `/users/{userId}/enrollments` subcollection, so the listing operation is already filtered by the `userId`. Similarly, assignments can be listed efficiently under each course.\n*   The use of path-based ownership (e.g., `/users/{userId}/...`) ensures that users can only access their own data, without needing complex filtering rules."
+  }
+}
