@@ -59,7 +59,7 @@ export const grades = [
   { courseCode: 'CS101', courseTitle: 'Intro to CS', term: 'Fall 2023', grade: 'A', score: 95 },
   { courseCode: 'MA210', courseTitle: 'Calculus II', term: 'Fall 2023', grade: 'B+', score: 88 },
   { courseCode: 'PH201', courseTitle: 'Physics I', term: 'Fall 2023', grade: 'A-', score: 91 },
-  { courseCode 'ENG101', courseTitle: 'English Composition', term: 'Fall 2023', grade: 'B', score: 85 },
+  { courseCode: 'ENG101', courseTitle: 'English Composition', term: 'Fall 2023', grade: 'B', score: 85 },
   { courseCode: 'WD202', courseTitle: 'Web Dev', term: 'Spring 2024', grade: 'A', score: 96 },
   { courseCode: 'MA250', courseTitle: 'Linear Algebra', term: 'Spring 2024', grade: 'C+', score: 78 },
   { courseCode: 'CS301', courseTitle: 'Data Structures', term: 'Spring 2024', grade: 'B-', score: 82 },
