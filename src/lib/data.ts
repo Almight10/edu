@@ -2,6 +2,7 @@ import { PlaceHolderImages } from './placeholder-images';
 
 const userAvatar = PlaceHolderImages.find(img => img.id === 'user-avatar-1');
 
+// This data is now for mock purposes and will be replaced by Firebase data.
 export const user = {
   name: 'Alex Doe',
   email: 'alex.doe@example.com',
