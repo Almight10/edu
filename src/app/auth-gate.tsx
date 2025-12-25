@@ -10,28 +10,25 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Jangan lakukan redirect jika masih loading
-    if (isUserLoading) return;
+    if (isUserLoading) return; // Do nothing while loading
 
-    const isAuthPage = pathname === '/';
+    const isLoginPage = pathname === '/login';
 
-    // Jika pengguna sudah login dan berada di halaman login, arahkan ke dashboard
-    if (user && isAuthPage) {
+    // If logged in, redirect from /login or / to the dashboard
+    if (user && (isLoginPage || pathname === '/')) {
       router.push('/dashboard');
     } 
-    // Jika pengguna belum login dan mencoba akses halaman selain login, arahkan ke halaman login
-    else if (!user && !isAuthPage) {
-      router.push('/');
+    // If not logged in and not on the login page, redirect to login
+    else if (!user && !isLoginPage) {
+      router.push('/login');
     }
   }, [user, isUserLoading, router, pathname]);
 
-  const isAuthPage = pathname === '/';
-  
-  // Tampilkan layar loading jika:
-  // 1. Firebase sedang memeriksa status auth.
-  // 2. Pengguna sudah login tapi masih di halaman login (menunggu redirect).
-  // 3. Pengguna belum login tapi mencoba akses halaman terproteksi (menunggu redirect).
-  if (isUserLoading || (user && isAuthPage) || (!user && !isAuthPage)) {
+  // Show a loading screen while we determine auth state or during redirects.
+  // 1. Firebase is checking auth state.
+  // 2. User is logged in but on a public page (waiting for redirect).
+  // 3. User is not logged in but on a protected page (waiting for redirect).
+  if (isUserLoading || (user && (pathname === '/login' || pathname === '/')) || (!user && pathname !== '/login')) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center">
         <p>Loading...</p>
@@ -39,6 +36,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Jika semua kondisi stabil dan pengguna berada di halaman yang tepat, tampilkan halaman.
+  // If all conditions are stable, render the page.
   return <>{children}</>;
 }
