@@ -10,17 +10,18 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!isUserLoading) {
-      const isAuthPage = pathname === '/';
-      if (user && isAuthPage) {
-        router.push('/dashboard');
-      } else if (!user && !isAuthPage) {
-        router.push('/');
-      }
+    if (isUserLoading) return; // Do nothing while loading
+    const isAuthPage = pathname === '/';
+    if (user && isAuthPage) {
+      router.push('/dashboard');
+    } else if (!user && !isAuthPage) {
+      router.push('/');
     }
   }, [user, isUserLoading, router, pathname]);
 
   const isAuthPage = pathname === '/';
+
+  // While loading, or if a redirect is imminent, show a loading screen.
   if (isUserLoading || (user && isAuthPage) || (!user && !isAuthPage)) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center">
