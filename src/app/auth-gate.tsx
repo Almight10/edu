@@ -25,7 +25,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
 
   // Tampilkan layar loading jika:
   // 1. Status user masih diperiksa (isUserLoading).
-  // 2. ATAU jika redirect sedang akan terjadi (misalnya, user sudah login tapi masih di halaman auth).
+  // 2. ATAU jika redirect sedang akan terjadi (misalnya, user sudah login tapi masih di halaman auth, atau sebaliknya).
   const isAuthPage = pathname === '/';
   if (isUserLoading || (user && isAuthPage) || (!user && !isAuthPage)) {
     return (
@@ -35,6 +35,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Jika semua kondisi sudah stabil, tampilkan halaman.
+  // Jika semua kondisi sudah stabil dan pengguna berada di halaman yang tepat, tampilkan halaman.
   return <>{children}</>;
 }
