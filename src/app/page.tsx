@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { GoogleAuthProvider, signInWithRedirect, getRedirectResult } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
 import { useAuth, useUser } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,30 +15,21 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
+    // If the user is already authenticated, redirect them to the dashboard.
     if (!isUserLoading && user) {
       router.push('/dashboard');
-      return;
     }
-
-    // Handle the redirect result from Google sign-in
-    getRedirectResult(auth)
-      .then((result) => {
-        if (result && result.user) {
-          router.push('/dashboard');
-        }
-      })
-      .catch((error) => {
-        // Handle Errors here.
-        console.error('Error getting redirect result', error);
-      });
-  }, [user, isUserLoading, router, auth]);
+  }, [user, isUserLoading, router]);
 
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
-    // Use signInWithRedirect instead of signInWithPopup
+    // The redirect will be handled by Firebase's onAuthStateChanged listener
+    // which is managed by the useUser hook.
     await signInWithRedirect(auth, provider);
   };
 
+  // While checking auth state or if user is logged in, show loading.
+  // This prevents a flash of the login page before redirecting.
   if (isUserLoading || user) {
     return (
       <main className="flex min-h-screen w-full items-center justify-center bg-background p-4">
@@ -48,6 +38,7 @@ export default function LoginPage() {
     );
   }
 
+  // If not loading and no user, show the login page.
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
