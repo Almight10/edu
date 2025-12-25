@@ -10,22 +10,23 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (isUserLoading) return; // Jangan lakukan apa-apa jika masih loading.
+    // Jangan lakukan apapun jika status user masih loading
+    if (isUserLoading) return;
 
     const isAuthPage = pathname === '/';
 
+    // Jika sudah login dan ada di halaman login, arahkan ke dashboard
     if (user && isAuthPage) {
-      // Jika sudah login dan ada di halaman login, arahkan ke dashboard.
       router.push('/dashboard');
-    } else if (!user && !isAuthPage) {
-      // Jika belum login dan mencoba akses halaman selain login, arahkan ke login.
+    } 
+    // Jika belum login dan mencoba akses halaman selain login, arahkan ke login
+    else if (!user && !isAuthPage) {
       router.push('/');
     }
   }, [user, isUserLoading, router, pathname]);
 
-  // Tampilkan layar loading jika:
-  // 1. Status user masih diperiksa (isUserLoading).
-  // 2. ATAU jika redirect sedang akan terjadi (misalnya, user sudah login tapi masih di halaman auth, atau sebaliknya).
+  // --- LOGIKA UTAMA ---
+  // Selalu tampilkan loading jika Firebase masih memeriksa atau jika redirect sedang terjadi.
   const isAuthPage = pathname === '/';
   if (isUserLoading || (user && isAuthPage) || (!user && !isAuthPage)) {
     return (
@@ -35,6 +36,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Jika semua kondisi sudah stabil dan pengguna berada di halaman yang tepat, tampilkan halaman.
+  // Jika semua kondisi stabil, tampilkan halaman.
   return <>{children}</>;
 }
