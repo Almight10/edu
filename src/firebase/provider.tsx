@@ -3,9 +3,8 @@
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
 import { FirebaseApp } from 'firebase/app';
 import { Firestore } from 'firebase/firestore';
-import { Auth, User } from 'firebase/auth';
+import { Auth, User, onAuthStateChanged } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
-import { useAuthListener } from '@/firebase/use-auth-listener';
 
 // Combined state for the Firebase context
 export interface FirebaseContextState {
@@ -45,6 +44,32 @@ interface FirebaseProviderProps {
 
 // React Context
 export const FirebaseContext = createContext<FirebaseContextState | undefined>(undefined);
+
+function useAuthListener(auth: Auth) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isUserLoading, setIsUserLoading] = useState(true);
+  const [userError, setUserError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    setIsUserLoading(true);
+    const listener = onAuthStateChanged(
+      auth,
+      (authUser) => {
+        setUser(authUser);
+        setIsUserLoading(false);
+      },
+      (error) => {
+        setUserError(error);
+        setIsUserLoading(false);
+      }
+    );
+
+    return () => listener();
+  }, [auth]);
+
+  return { user, isUserLoading, userError };
+}
+
 
 /**
  * FirebaseProvider manages and provides Firebase services and user authentication state.
