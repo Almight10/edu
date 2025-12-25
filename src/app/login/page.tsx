@@ -1,6 +1,6 @@
 'use client';
 
-import { GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '@/firebase/firebase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,8 +17,7 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      // Use signInWithRedirect for better mobile compatibility
-      await signInWithRedirect(auth, provider);
+      await signInWithPopup(auth, provider);
     } catch (error) {
       console.error("Error signing in with Google", error);
     }
@@ -30,8 +29,6 @@ export default function LoginPage() {
     }
   }, [user, loading, router]);
 
-  // The loading state will be true after redirecting back from Google
-  // until the user state is confirmed by onAuthStateChanged.
   if (loading) {
      return (
       <div className="flex min-h-screen w-full items-center justify-center">
@@ -40,7 +37,7 @@ export default function LoginPage() {
     );
   }
   
-  // If user is already logged in (e.g. presses back button), redirect to dashboard
+  // Jika pengguna sudah login (misalnya menekan tombol kembali), arahkan ke dasbor
   if (user) {
      return (
       <div className="flex min-h-screen w-full items-center justify-center">
