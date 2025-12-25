@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect } from 'react';
@@ -12,23 +13,26 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isUserLoading) return; // Do nothing while loading
 
-    const isLoginPage = pathname === '/login';
+    const isAuthPage = pathname === '/login';
 
-    // If logged in, redirect from /login or / to the dashboard
-    if (user && (isLoginPage || pathname === '/')) {
-      router.push('/dashboard');
+    // If user is logged in
+    if (user) {
+      // If they are on the login page or root, redirect to dashboard
+      if (isAuthPage || pathname === '/') {
+        router.push('/dashboard');
+      }
     } 
-    // If not logged in and not on the login page, redirect to login
-    else if (!user && !isLoginPage) {
-      router.push('/login');
+    // If user is not logged in
+    else {
+      // And they are not on the login page, redirect them there
+      if (!isAuthPage) {
+        router.push('/login');
+      }
     }
   }, [user, isUserLoading, router, pathname]);
 
-  // Show a loading screen while we determine auth state or during redirects.
-  // 1. Firebase is checking auth state.
-  // 2. User is logged in but on a public page (waiting for redirect).
-  // 3. User is not logged in but on a protected page (waiting for redirect).
-  if (isUserLoading || (user && (pathname === '/login' || pathname === '/')) || (!user && pathname !== '/login')) {
+  // While loading, or if a redirect is imminent, show a loading screen.
+  if (isUserLoading || (!user && pathname !== '/login') || (user && (pathname === '/login' || pathname === '/'))) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center">
         <p>Loading...</p>
@@ -36,6 +40,5 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // If all conditions are stable, render the page.
   return <>{children}</>;
 }
