@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 import { useAuth, useUser } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,17 +18,26 @@ export default function LoginPage() {
   useEffect(() => {
     if (!isUserLoading && user) {
       router.push('/dashboard');
+      return;
     }
-  }, [user, isUserLoading, router]);
+
+    // Handle the redirect result from Google sign-in
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result && result.user) {
+          router.push('/dashboard');
+        }
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        console.error('Error getting redirect result', error);
+      });
+  }, [user, isUserLoading, router, auth]);
 
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-      router.push('/dashboard');
-    } catch (error) {
-      console.error('Error signing in with Google', error);
-    }
+    // Use signInWithRedirect instead of signInWithPopup
+    await signInWithRedirect(auth, provider);
   };
 
   if (isUserLoading || user) {
