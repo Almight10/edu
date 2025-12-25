@@ -1,8 +1,8 @@
 export const firebaseConfig = {
-  projectId: "studio-8432650142-13775",
-  appId: "1:443833292497:web:9c6c196a63505c8227b958",
-  apiKey: "AIzaSyDS0aKQfqBzUN53pavH1ESPu5zcuQ2BHPY",
-  authDomain: "studio-8432650142-13775.firebaseapp.com",
-  messagingSenderId: "443833292497",
-  storageBucket: "studio-8432650142-13775.appspot.com", // Ditambahkan dari repo referensi
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
 };
