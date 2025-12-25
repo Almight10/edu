@@ -1,24 +1,26 @@
-
-"use client";
+'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { LogOut, Settings } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { useAuth, useUser } from '@/firebase';
+import { auth } from '@/firebase/firebase';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export function UserProfile() {
-  const auth = useAuth();
-  const { user } = useUser();
+  const { user } = useAuth();
   const router = useRouter();
 
   const handleSignOut = async () => {
-    await signOut(auth);
-    router.push('/login');
+    try {
+      await signOut(auth);
+      router.push('/login');
+    } catch (error) {
+      console.error("Error signing out", error);
+    }
   };
   
   if (!user) {
