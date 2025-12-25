@@ -1,9 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
-import { useAuth, useUser } from '@/firebase';
+import { useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { GoogleIcon } from '@/components/icons';
@@ -11,34 +9,12 @@ import { Logo } from '@/components/logo';
 
 export default function LoginPage() {
   const auth = useAuth();
-  const { user, isUserLoading } = useUser();
-  const router = useRouter();
-
-  useEffect(() => {
-    // If the user is already authenticated, redirect them to the dashboard.
-    if (!isUserLoading && user) {
-      router.push('/dashboard');
-    }
-  }, [user, isUserLoading, router]);
 
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
-    // The redirect will be handled by Firebase's onAuthStateChanged listener
-    // which is managed by the useUser hook.
     await signInWithRedirect(auth, provider);
   };
 
-  // While checking auth state or if user is logged in, show loading.
-  // This prevents a flash of the login page before redirecting.
-  if (isUserLoading || user) {
-    return (
-      <main className="flex min-h-screen w-full items-center justify-center bg-background p-4">
-        <p>Loading...</p>
-      </main>
-    );
-  }
-
-  // If not loading and no user, show the login page.
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
