@@ -2,8 +2,9 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import type { ReactNode } from 'react';
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children }: { children: ReactNode }) => {
     const { user, loading } = useAuth();
     const router = useRouter();
 
@@ -21,7 +22,7 @@ const ProtectedRoute = ({ children }) => {
         );
     }
 
-    return children;
+    return <>{children}</>;
 };
 
 export default ProtectedRoute;
