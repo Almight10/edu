@@ -37,7 +37,7 @@ export default function LoginPage() {
     );
   }
   
-  // Jika pengguna sudah login (misalnya menekan tombol kembali), arahkan ke dasbor
+  // If the user is already logged in (e.g. hits the back button), redirect to dashboard
   if (user) {
      return (
       <div className="flex min-h-screen w-full items-center justify-center">
