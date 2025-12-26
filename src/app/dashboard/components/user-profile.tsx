@@ -1,7 +1,6 @@
 'use client';
 
-import Image from 'next/image';
-import { LogOut, Settings } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -24,11 +23,18 @@ export function UserProfile() {
   };
   
   if (!user) {
-    return null;
+    // This can happen briefly on load, return a placeholder or null
+    return (
+      <Button variant="ghost" className="relative h-auto justify-start gap-3 w-full px-2">
+          <Avatar className="h-9 w-9">
+            <AvatarFallback>?</AvatarFallback>
+          </Avatar>
+      </Button>
+    );
   }
 
   const { displayName, email, photoURL } = user;
-  const fallback = displayName ? displayName.charAt(0) : email?.charAt(0) || 'U';
+  const fallback = displayName ? displayName.charAt(0).toUpperCase() : email?.charAt(0).toUpperCase() || 'U';
 
   return (
     <DropdownMenu>
@@ -53,11 +59,6 @@ export function UserProfile() {
             </p>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
-        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
             <LogOut className="mr-2 h-4 w-4" />

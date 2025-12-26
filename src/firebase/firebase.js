@@ -2,7 +2,7 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
 // Your web app's Firebase configuration
-// IMPORTANT: Replace with your actual Firebase configuration
+// PENTING: Ganti dengan konfigurasi Firebase Anda yang sebenarnya
 export const firebaseConfig = {
   projectId: 'studio-8432650142-13775',
   appId: '1:443833292497:web:9c6c196a63505c8227b958',
