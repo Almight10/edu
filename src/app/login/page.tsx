@@ -1,12 +1,12 @@
 'use client';
 
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { auth } from '@/firebase/firebase';
+import { auth } from '@/firebase/firebase.js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { GoogleIcon } from '@/components/icons';
 import { Logo } from '@/components/logo';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext.js';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -37,7 +37,6 @@ export default function LoginPage() {
     );
   }
   
-  // If the user is already logged in (e.g. hits the back button), redirect to dashboard
   if (user) {
      return (
       <div className="flex min-h-screen w-full items-center justify-center">

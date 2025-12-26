@@ -4,10 +4,10 @@ import { LogOut } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { auth } from '@/firebase/firebase';
+import { auth } from '@/firebase/firebase.js';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext.js';
 
 export function UserProfile() {
   const { user } = useAuth();
@@ -23,7 +23,6 @@ export function UserProfile() {
   };
   
   if (!user) {
-    // This can happen briefly on load, return a placeholder or null
     return (
       <Button variant="ghost" className="relative h-auto justify-start gap-3 w-full px-2">
           <Avatar className="h-9 w-9">

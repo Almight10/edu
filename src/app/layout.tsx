@@ -1,7 +1,7 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
-import { AuthContextProvider } from '@/context/AuthContext';
+import { AuthContextProvider } from '@/context/AuthContext.js';
 
 export const metadata: Metadata = {
   title: 'EduConnect',
